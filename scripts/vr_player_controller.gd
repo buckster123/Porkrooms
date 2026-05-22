@@ -22,10 +22,17 @@ func _ready():
 	# Check if XR is active (may take a few frames on Quest)
 	_update_xr_status()
 	XRServer.interface_added.connect(_on_xr_interface_added)
+	# Spawn at level generator's spawn point (above first room floor)
+	call_deferred("_position_at_spawn")
 
 func _on_xr_interface_added(interface_name: String):
 	if interface_name == "OpenXR":
 		call_deferred("_update_xr_status")
+
+func _position_at_spawn():
+	var generator = get_node_or_null("../LevelGenerator")
+	if generator and generator.has_method("get_spawn_point"):
+		global_position = generator.get_spawn_point()
 
 func _update_xr_status():
 	if XRServer.primary_interface:
@@ -37,7 +44,7 @@ func _update_xr_status():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		print("Desktop mode active")
 		# Position camera at eye height for desktop
-		origin.position.y = 1.7
+		origin.position.y = 1.0
 
 func _physics_process(delta):
 	# Retry XR detection for first few frames (Quest init timing)
@@ -65,7 +72,8 @@ func _process_desktop_movement(delta):
 		speed = sprint_speed
 	
 	var input_dir = Input.get_vector("moveLeft", "moveRight", "moveUp", "moveDown")
-	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	# Use XROrigin3D basis for movement direction (tracks camera yaw)
+	var direction = (origin.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
 	if direction:
 		velocity.x = direction.x * speed

@@ -8,8 +8,10 @@ export_presets.cfg
 # Build artifacts
 android/build/build/
 android/build/.gradle/
+android/build/libs/
 *.apk
 *.aab
+*.idsig
 
 # IDE
 .vscode/

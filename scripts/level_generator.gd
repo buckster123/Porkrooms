@@ -70,14 +70,23 @@ func _create_materials():
 	wall_mat.albedo_color = Color(0.82, 0.78, 0.55)
 	wall_mat.roughness = 0.92
 	wall_mat.metallic = 0.0
+	wall_mat.emission_enabled = true
+	wall_mat.emission = Color(0.01, 0.01, 0.005)
+	wall_mat.emission_energy = 0.15
 	
 	floor_mat = StandardMaterial3D.new()
 	floor_mat.albedo_color = Color(0.32, 0.28, 0.20)
 	floor_mat.roughness = 0.75
+	floor_mat.emission_enabled = true
+	floor_mat.emission = Color(0.005, 0.005, 0.002)
+	floor_mat.emission_energy = 0.1
 	
 	ceiling_mat = StandardMaterial3D.new()
 	ceiling_mat.albedo_color = Color(0.88, 0.88, 0.82)
 	ceiling_mat.roughness = 0.95
+	ceiling_mat.emission_enabled = true
+	ceiling_mat.emission = Color(0.015, 0.015, 0.01)
+	ceiling_mat.emission_energy = 0.2
 	
 	trim_mat = StandardMaterial3D.new()
 	trim_mat.albedo_color = Color(0.95, 0.95, 0.92)
@@ -292,17 +301,38 @@ func _connect_rooms(room_a: Dictionary, room_b: Dictionary):
 	})
 
 func _add_box(name: String, parent: Node3D, pos: Vector3, size: Vector3, mat: Material, is_floor: bool = false):
+	# StaticBody3D for physics collision
+	var body = StaticBody3D.new()
+	body.name = name
+	body.position = pos
+	body.collision_layer = 1
+	parent.add_child(body)
+	if Engine.is_editor_hint():
+		body.owner = get_tree().edited_scene_root
+	
+	var collision = CollisionShape3D.new()
+	collision.name = name + "_Collision"
+	var box_shape = BoxShape3D.new()
+	box_shape.size = size
+	collision.shape = box_shape
+	body.add_child(collision)
+	if Engine.is_editor_hint():
+		collision.owner = get_tree().edited_scene_root
+	
+	if is_floor:
+		print("Collision floor: ", name, " size=", size)
+	
 	var mi = MeshInstance3D.new()
-	mi.name = name
+	mi.name = name + "_Mesh"
 	mi.mesh = BoxMesh.new()
 	mi.mesh.size = size
 	mi.material_override = mat
-	mi.position = pos
-	if is_floor:
-		mi.set_meta("surface", "Concrete")
-	parent.add_child(mi)
+	body.add_child(mi)
 	if Engine.is_editor_hint():
 		mi.owner = get_tree().edited_scene_root
+	
+	if is_floor:
+		mi.set_meta("surface", "Concrete")
 
 func _add_plafond_light(parent: Node3D, name: String, pos: Vector3, broken: bool, mood: float = 0.5):
 	var fixture_root = Node3D.new()
@@ -355,7 +385,7 @@ func _add_plafond_light(parent: Node3D, name: String, pos: Vector3, broken: bool
 	light.spot_range = 12.0 + mood * 5.0
 	light.spot_angle = 75.0 + mood * 10.0
 	light.spot_angle_attenuation = 2.0
-	light.shadow_enabled = true
+	light.shadow_enabled = false  # Disabled for Quest Mobile — too many shadow-casting lights
 	fixture_root.add_child(light)
 	if Engine.is_editor_hint():
 		light.owner = get_tree().edited_scene_root

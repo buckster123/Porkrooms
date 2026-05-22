@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://b1porkrooms01"]
+[gd_scene load_steps=11 format=3 uid="uid://b1porkrooms01"]
 
 [ext_resource type="Script" path="res://scripts/level_generator.gd" id="1_level"]
 [ext_resource type="Material" path="res://assets/film_grain_material.tres" id="2_grain"]
@@ -8,12 +8,16 @@
 [ext_resource type="Script" path="res://scripts/battery_pickup.gd" id="6_battery"]
 [ext_resource type="Script" path="res://scripts/vr_player_controller.gd" id="7_player"]
 
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_01"]
+radius = 0.3
+height = 1.0
+
 [sub_resource type="Environment" id="Environment_01"]
 background_color = Color(0.05, 0.05, 0.04, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.25, 0.3, 0.2, 1)
 ambient_light_energy = 2.5
-fog_enabled = true
+fog_enabled = false
 fog_mode = 1
 fog_light_color = Color(0.18, 0.22, 0.15, 1)
 fog_density = 0.02
@@ -46,6 +50,9 @@ script = ExtResource("7_player")
 walk_speed = 3.0
 sprint_speed = 5.5
 mouse_sensitivity = 0.003
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+shape = SubResource("CapsuleShape3D_01")
 
 [node name="XROrigin3D" type="XROrigin3D" parent="Player"]
 
