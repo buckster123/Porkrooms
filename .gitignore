@@ -1,0 +1,24 @@
+# Godot
+.import/
+.godot/
+export.cfg
+export_presets.cfg
+*.tmp
+
+# Build artifacts
+android/build/build/
+android/build/.gradle/
+*.apk
+*.aab
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.keystore
+*.jks

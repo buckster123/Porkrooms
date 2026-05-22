@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://fg01"]
+
+[ext_resource type="Shader" path="res://scripts/film_grain.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/grain_intensity = 0.06
+shader_parameter/vignette_intensity = 0.5
+shader_parameter/scanline_intensity = 0.02

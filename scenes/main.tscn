@@ -1,0 +1,122 @@
+[gd_scene load_steps=10 format=3 uid="uid://b1porkrooms01"]
+
+[ext_resource type="Script" path="res://scripts/level_generator.gd" id="1_level"]
+[ext_resource type="Material" path="res://assets/film_grain_material.tres" id="2_grain"]
+[ext_resource type="Script" path="res://scripts/enemy_ai.gd" id="3_boar"]
+[ext_resource type="Script" path="res://scripts/flashlight.gd" id="4_flash"]
+[ext_resource type="Script" path="res://scripts/footstep_system.gd" id="5_steps"]
+[ext_resource type="Script" path="res://scripts/battery_pickup.gd" id="6_battery"]
+[ext_resource type="Script" path="res://scripts/vr_player_controller.gd" id="7_player"]
+
+[sub_resource type="Environment" id="Environment_01"]
+background_color = Color(0.05, 0.05, 0.04, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.25, 0.3, 0.2, 1)
+ambient_light_energy = 2.5
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.18, 0.22, 0.15, 1)
+fog_density = 0.02
+fog_aerial_perspective = 0.15
+tonemap_mode = 3
+glow_enabled = true
+glow_normalized = true
+glow_intensity = 0.3
+glow_strength = 0.8
+glow_hdr_scale = 1.5
+adjustment_enabled = true
+adjustment_saturation = 0.85
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_01"]
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_01")
+camera_attributes = SubResource("CameraAttributesPractical_01")
+
+[node name="LevelGenerator" type="Node3D" parent="."]
+script = ExtResource("1_level")
+seed = 0
+room_count = 12
+
+[node name="Player" type="CharacterBody3D" parent="."]
+groups = ["player"]
+script = ExtResource("7_player")
+walk_speed = 3.0
+sprint_speed = 5.5
+mouse_sensitivity = 0.003
+
+[node name="XROrigin3D" type="XROrigin3D" parent="Player"]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="Player/XROrigin3D"]
+
+[node name="DebugLight" type="OmniLight3D" parent="Player/XROrigin3D/XRCamera3D"]
+light_color = Color(0.9, 0.95, 0.82, 1)
+light_energy = 3.0
+omni_range = 15.0
+
+[node name="LeftHand" type="XRController3D" parent="Player/XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0, -0.2)
+tracker = &"left_hand"
+
+[node name="RightHand" type="XRController3D" parent="Player/XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0, -0.2)
+tracker = &"right_hand"
+
+[node name="Flashlight" type="SpotLight3D" parent="Player/XROrigin3D/RightHand"]
+groups = ["flashlight"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -0.1)
+script = ExtResource("4_flash")
+shadow_enabled = true
+
+[node name="FootstepSystem" type="Node3D" parent="Player/XROrigin3D"]
+script = ExtResource("5_steps")
+step_interval_walk = 0.5
+step_interval_run = 0.3
+
+[node name="RayCast3D" type="RayCast3D" parent="Player/XROrigin3D/FootstepSystem"]
+target_position = Vector3(0, -0.6, 0)
+collision_mask = 2
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="Player/XROrigin3D/FootstepSystem"]
+
+[node name="Boar" type="CharacterBody3D" parent="."]
+script = ExtResource("3_boar")
+roam_speed = 1.5
+chase_speed = 5.0
+detection_range = 12.0
+attack_range = 1.8
+wander_radius = 8.0
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+autoplay = true
+max_distance = 50.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+material = ExtResource("2_grain")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="InteractionLabel" type="Label" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = 40.0
+offset_right = 200.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
